@@ -1,0 +1,11 @@
+{% extends "admin/dashboard.html" %}
+{% block title %}Add Subject{% endblock %}
+{% block ops %}
+<h2>Add Subject</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }} {{ form.name() }}
+    {{ form.description.label }} {{ form.description() }}
+    {{ form.submit() }}
+</form>
+{% endblock %}

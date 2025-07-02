@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import DateTimeField, DateTimeLocalField, StringField, PasswordField, SubmitField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 
@@ -22,3 +22,15 @@ class LoginForm(FlaskForm):
         DataRequired(), Length(min=8)
     ])
     submit = SubmitField('Login')
+
+class subjectForm(FlaskForm):
+    name = StringField('Subject Name', validators=[DataRequired(), Length(min=2, max=80)])
+    description = StringField('Description', validators=[Length(max=200)])
+    submit = SubmitField('Add Subject')
+
+class quizForm(FlaskForm):
+    name = StringField('Quiz Name', validators=[DataRequired(), Length(min=2, max=80)])
+    subject_id = SelectField('Subject', coerce=int, validators=[DataRequired()])
+    date_of_quiz = DateTimeLocalField('Date of Quiz', validators=[DataRequired()])
+    duration = IntegerField('Duration', validators=[DataRequired()])
+    submit = SubmitField('Add Quiz')

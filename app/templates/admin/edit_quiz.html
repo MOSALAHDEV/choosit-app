@@ -1,0 +1,12 @@
+{% extends "admin/dashboard.html" %}
+{% block title %}Edit Quiz{% endblock %}
+{% block ops %}
+<h2>Edit Quiz</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }} {{ form.name() }}
+    {{ form.date_of_quiz.label }} {{ form.date_of_quiz() }}
+    {{ form.duration.label }} {{ form.duration() }}
+    {{ form.submit() }}
+</form>
+{% endblock %}
