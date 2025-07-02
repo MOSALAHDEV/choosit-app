@@ -1,0 +1,15 @@
+{% extends "admin/dashboard.html" %}
+{% block title %}Edit Question{% endblock %}
+{% block ops %}
+<h2>Edit Question</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.statement.label }} {{ form.statement() }}
+    {{ form.answer_1.label }} {{ form.answer_1() }}
+    {{ form.answer_2.label }} {{ form.answer_2() }}
+    {{ form.answer_3.label }} {{ form.answer_3() }}
+    {{ form.answer_4.label }} {{ form.answer_4() }}
+    {{ form.correct_option.label }} {{ form.correct_option() }}
+    {{ form.submit() }}
+</form>
+{% endblock %}

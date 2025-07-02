@@ -313,9 +313,7 @@ def admin_delete_question(id):
         return redirect(url_for('dashboard'))
     question = Question.query.get_or_404(id)
     quiz_id = question.quiz_id
-
     db.session.delete(question)
     db.session.commit()
-
     flash('Question deleted successfully!', 'success')
     return redirect(url_for('admin_manage_question', quiz_id=quiz_id))
