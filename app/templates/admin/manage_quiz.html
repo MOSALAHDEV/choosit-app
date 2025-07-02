@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Manage Quiz{% endblock %}
+{% block content %}
+<h1>Manage Quiz</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Date of Quiz</th>
+            <th>Duration</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for quiz in quiz %}
+            <tr>
+                <td>{{ quiz.id }}</td>
+                <td>{{ quiz.name }}</td>
+                <td>{{ quiz.date_of_quiz }}</td>
+                <td>{{ quiz.duration }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

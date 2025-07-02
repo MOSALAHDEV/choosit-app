@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Manage Question{% endblock %}
+{% block content %}
+<h1>Manage Question</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Question</th>
+            <th>Answer 1</th>
+            <th>Answer 2</th>
+            <th>Answer 3</th>
+            <th>Answer 4</th>
+            <th>Correct Option</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for question in question %}
+            <tr>
+                <td>{{ question.id }}</td>
+                <td>{{ question.statement }}</td>
+                <td>{{ question.answer_1 }}</td>
+                <td>{{ question.answer_2 }}</td>
+                <td>{{ question.answer_3 }}</td>
+                <td>{{ question.answer_4 }}</td>
+                <td>{{ question.correct_option }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

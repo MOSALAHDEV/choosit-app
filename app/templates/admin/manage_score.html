@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Manage Score{% endblock %}
+{% block content %}
+<h1>Manage Score</h1>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Score</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for score in score %}
+            <tr>
+                <td>{{ score.id }}</td>
+                <td>{{ score.score }}</td>
+                <td>{{ score.timestamp }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
