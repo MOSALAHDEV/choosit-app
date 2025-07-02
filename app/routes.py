@@ -2,7 +2,7 @@
 from app import create_app, db, login_manager
 from flask import render_template, redirect, url_for, flash
 from app.models import User, Subject, Quiz, Question, Score
-from app.forms import RegisterForm, LoginForm, subjectForm, quizForm
+from app.forms import RegisterForm, LoginForm, subjectForm, quizForm, questionForm
 from flask_login import login_user, logout_user, login_required, current_user
 
 app = create_app()
@@ -63,10 +63,13 @@ def logout():
     flash('User logged out successfully!', category="success")
     return redirect(url_for('login'))
 
+
 @login_manager.user_loader
 def loading_user(user_id):
     return User.query.get(user_id)
 
+
+# Admin Routes
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     """Admin login Route"""
@@ -95,34 +98,6 @@ def admin_dashboard():
         return redirect(url_for('dashboard'))
     return render_template('/admin/dashboard.html')
 
-@app.route('/admin/manage_subject', methods=['GET', 'POST'])
-@login_required
-def admin_manage_subject():
-    """admin manage subject route"""
-    if not current_user.is_admin:
-        flash('You are not authorized to access this page.', 'danger')
-        return redirect(url_for('dashboard'))
-    subject = Subject.query.all()
-    return render_template('/admin/manage_subject.html', subject=subject)
-
-@app.route('/admin/manage_quiz', methods=['GET', 'POST'])
-@login_required
-def admin_manage_quiz():
-    """admin manage quiz route"""
-    if not current_user.is_admin:
-        flash('You are not authorized to access this page.', 'danger')
-        return redirect(url_for('dashboard'))
-    quiz = Quiz.query.all()
-    return render_template('/admin/manage_quiz.html', quiz=quiz)
-
-@app.route('/admin/manage_question', methods=['GET', 'POST'])
-@login_required
-def admin_manage_question():
-    if not current_user.is_admin:
-        flash('You are not authorized to access this page.', 'danger')
-        return redirect(url_for('dashboard'))
-    question = Question.query.all()
-    return render_template('/admin/manage_question.html', question=question)
 
 @app.route('/admin/manage_user', methods=['GET', 'POST'])
 @login_required
@@ -134,6 +109,7 @@ def admin_manage_user():
     user = User.query.all()
     return render_template('/admin/manage_user.html', user=user)
 
+
 @app.route('/admin/manage_score', methods=['GET', 'POST'])
 @login_required
 def admin_manage_score():
@@ -144,7 +120,19 @@ def admin_manage_score():
     score = Score.query.all()
     return render_template('/admin/manage_score.html', score=score)
 
+
 # Subject Management Routes
+@app.route('/admin/manage_subject', methods=['GET', 'POST'])
+@login_required
+def admin_manage_subject():
+    """admin manage subject route"""
+    if not current_user.is_admin:
+        flash('You are not authorized to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    subject = Subject.query.all()
+    return render_template('/admin/manage_subject.html', subject=subject)
+
+
 @app.route('/admin/add_subject', methods=['GET', 'POST'])
 @login_required
 def admin_add_subject():
@@ -157,9 +145,10 @@ def admin_add_subject():
         subject = Subject(name=form.name.data, description=form.description.data)
         db.session.add(subject)
         db.session.commit()
-        flash('Subject added successfully!', 'success')
+        flash('Subject saved successfully!', 'success')
         return redirect(url_for('admin_manage_subject'))
     return render_template('/admin/add_subject.html', form=form)
+
 
 @app.route('/admin/edit_subject/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -178,6 +167,7 @@ def admin_edit_subject(id):
         return redirect(url_for('admin_manage_subject'))
     return render_template('/admin/edit_subject.html', form=form)
 
+
 @app.route('/admin/delete_subject/<int:id>', methods=['POST'])
 @login_required
 def admin_delete_subject(id):
@@ -191,7 +181,19 @@ def admin_delete_subject(id):
     flash('Subject deleted successfully!', 'success')
     return redirect(url_for('admin_manage_subject'))
 
+
 # Quiz Management Routes
+@app.route('/admin/manage_quiz', methods=['GET', 'POST'])
+@login_required
+def admin_manage_quiz():
+    """admin manage quiz route"""
+    if not current_user.is_admin:
+        flash('You are not authorized to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    quiz = Quiz.query.all()
+    return render_template('/admin/manage_quiz.html', quiz=quiz)
+
+
 @app.route('/admin/add_quiz', methods=['GET', 'POST'])
 @login_required
 def admin_add_quiz():
@@ -205,9 +207,10 @@ def admin_add_quiz():
         quiz = Quiz(name=form.name.data, subject_id=form.subject_id.data, date_of_quiz=form.date_of_quiz.data, duration=form.duration.data)
         db.session.add(quiz)
         db.session.commit()
-        flash('Quiz added successfully!', 'success')
+        flash('Quiz saved successfully!', 'success')
         return redirect(url_for('admin_manage_quiz'))
     return render_template('/admin/add_quiz.html', form=form)
+
 
 @app.route('/admin/edit_quiz/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -229,6 +232,7 @@ def admin_edit_quiz(id):
         return redirect(url_for('admin_manage_quiz'))
     return render_template('/admin/edit_quiz.html', form=form)
 
+
 @app.route('/admin/delete_quiz/<int:id>', methods=['POST'])
 @login_required
 def admin_delete_quiz(id):
@@ -241,3 +245,77 @@ def admin_delete_quiz(id):
     db.session.commit()
     flash('Quiz deleted successfully!', 'success')
     return redirect(url_for('admin_manage_quiz'))
+
+
+# Question Management Routes
+@app.route('/admin/manage_question/<int:quiz_id>', methods=['GET', 'POST'])
+@login_required
+def admin_manage_question(quiz_id):
+    if not current_user.is_admin:
+        flash('You are not authorized to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    quiz = Quiz.query.get_or_404(quiz_id)
+    questions = Question.query.filter_by(quiz_id=quiz_id).all()
+    return render_template('/admin/manage_question.html', questions=questions, quiz=quiz)
+
+@app.route('/admin/add_question/<int:quiz_id>', methods=['GET', 'POST'])
+@login_required
+def admin_add_question(quiz_id):
+    """admin add question route"""
+    if not current_user.is_admin:
+        flash('You are not authorized to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    quiz = Quiz.query.get_or_404(quiz_id)
+    form = questionForm()
+    if form.validate_on_submit():
+        question = Question(
+            statement=form.statement.data,
+            answer_1=form.answer_1.data,
+            answer_2=form.answer_2.data,
+            answer_3=form.answer_3.data,
+            answer_4=form.answer_4.data,
+            correct_option=form.correct_option.data,
+            quiz_id=quiz_id
+        )
+        db.session.add(question)
+        db.session.commit()
+        flash('Question saved successfully!', 'success')
+        return redirect(url_for('admin_manage_question', quiz_id=quiz_id))
+    return render_template('/admin/add_question.html', form=form, quiz=quiz)
+
+
+@app.route('/admin/edit_question/<int:id>', methods=['GET', 'POST'])
+@login_required
+def admin_edit_question(id):
+    if not current_user.is_admin:
+        flash('You are not authorized to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    question = Question.query.get_or_404(id)
+    form = questionForm(obj=question)
+    if form.validate_on_submit():
+        question.statement = form.statement.data
+        question.answer_1 = form.answer_1.data
+        question.answer_2 = form.answer_2.data
+        question.answer_3 = form.answer_3.data
+        question.answer_4 = form.answer_4.data
+        question.correct_option = form.correct_option.data
+        db.session.commit()
+        flash('Question updated successfully!', 'success')
+        return redirect(url_for('admin_manage_question', quiz_id=question.quiz_id))
+    return render_template('/admin/edit_question.html', form=form, question=question)
+
+
+@app.route('/admin/delete_question/<int:id>', methods=['POST'])
+@login_required
+def admin_delete_question(id):
+    if not current_user.is_admin:
+        flash('You are not authorized to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    question = Question.query.get_or_404(id)
+    quiz_id = question.quiz_id
+
+    db.session.delete(question)
+    db.session.commit()
+
+    flash('Question deleted successfully!', 'success')
+    return redirect(url_for('admin_manage_question', quiz_id=quiz_id))

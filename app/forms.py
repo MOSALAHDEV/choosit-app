@@ -34,3 +34,17 @@ class quizForm(FlaskForm):
     date_of_quiz = DateTimeLocalField('Date of Quiz', validators=[DataRequired()])
     duration = IntegerField('Duration', validators=[DataRequired()])
     submit = SubmitField('Add Quiz')
+
+class questionForm(FlaskForm):
+    statement = StringField('Statement', validators=[DataRequired()])
+    answer_1 = StringField('First Choice', validators=[DataRequired()])
+    answer_2 = StringField('Second Choice', validators=[DataRequired()])
+    answer_3 = StringField('Third Choice', validators=[DataRequired()])
+    answer_4 = StringField('Fourth Choice', validators=[DataRequired()])
+    
+    correct_option = SelectField(
+        'Correct Choice',
+        choices=[('A', 'First Choice'), ('B', 'Second Choice'), ('C', 'Third Choice'), ('D', 'Fourth Choice')],
+        validators=[DataRequired()])
+    
+    submit = SubmitField('Add Question')
