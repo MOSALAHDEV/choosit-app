@@ -8,7 +8,7 @@ import os
 class User(db.Model, UserMixin):
     """ User model """
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
+    username = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
     score = db.relationship("Score", backref="user", lazy=True) # one to many relationship

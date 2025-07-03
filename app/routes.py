@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 from app import create_app, db, login_manager
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from app.models import User, Subject, Quiz, Question, Score
 from app.forms import RegisterForm, LoginForm, subjectForm, quizForm, questionForm
 from flask_login import login_user, logout_user, login_required, current_user
+
 
 app = create_app()
 
@@ -21,6 +22,7 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """Register route"""
     form = RegisterForm()
     if form.validate_on_submit():
         user = User(
@@ -37,6 +39,7 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Login route"""
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -53,12 +56,15 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    """Dashboard route"""
+    quizzes = Quiz.query.all()
+    return render_template('dashboard.html', quizzes=quizzes)
 
 
 @app.route('/logout')
 @login_required
 def logout():
+    """Logout route"""
     logout_user()
     flash('User logged out successfully!', category="success")
     return redirect(url_for('login'))
@@ -176,6 +182,9 @@ def admin_delete_subject(id):
         flash('You are not authorized to access this page.', 'danger')
         return redirect(url_for('dashboard'))
     subject = Subject.query.get_or_404(id)
+    if subject.quizzes:
+        flash('Subject has quizzes, cannot be deleted.', 'danger')
+        return redirect(url_for('admin_manage_subject'))
     db.session.delete(subject)
     db.session.commit()
     flash('Subject deleted successfully!', 'success')
@@ -241,6 +250,9 @@ def admin_delete_quiz(id):
         flash('You are not authorized to access this page.', 'danger')
         return redirect(url_for('dashboard'))
     quiz = Quiz.query.get_or_404(id)
+    Score.query.filter_by(quiz_id=id).delete(synchronize_session=False)
+    for question in quiz.questions:
+        db.session.delete(question)
     db.session.delete(quiz)
     db.session.commit()
     flash('Quiz deleted successfully!', 'success')
@@ -317,3 +329,32 @@ def admin_delete_question(id):
     db.session.commit()
     flash('Question deleted successfully!', 'success')
     return redirect(url_for('admin_manage_question', quiz_id=quiz_id))
+
+# Take Quiz Get Result Route
+@app.route('/quiz/<int:quiz_id>', methods=['GET', 'POST'])
+@login_required
+def take_quiz(quiz_id):
+    """take quiz route"""
+    quiz = Quiz.query.get_or_404(quiz_id)
+    questions = Question.query.filter_by(quiz_id=quiz_id).all()
+    if request.method == 'POST':
+        score = 0
+        for question in questions:
+            user_answer = request.form.get(f'question_{question.id}')
+            if user_answer == question.correct_option:
+                score += 1
+        user_result = Score(user_id=current_user.id, quiz_id=quiz_id, score=score)
+        db.session.add(user_result)
+        db.session.commit()
+        flash(f'Quiz completed successfully! Your score is {score} out of {len(questions)}', 'success')
+        return redirect(url_for('result', quiz_id=quiz_id))
+    return render_template('take_quiz.html', quiz=quiz, questions=questions)
+
+
+@app.route('/result/<int:quiz_id>', methods=['GET'])
+@login_required
+def result(quiz_id):
+    """result route"""
+    quiz = Quiz.query.get_or_404(quiz_id)
+    score = Score.query.filter_by(quiz_id=quiz_id).all()
+    return render_template('result.html', quiz=quiz, score=score)
