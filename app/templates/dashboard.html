@@ -1,5 +1,26 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
-{% block content %}
-<h1>Learner dashboard</h1>
+
+{% block ops %}
+<div class="container">
+  <h2 class="mb-4">Welcome, {{ current_user.username }}</h2>
+
+  {% if quizzes and quizzes|length > 0 %}
+    <p class="mb-3">Choose a quiz to take:</p>
+
+    <ul class="list-group">
+      {% for q in quizzes %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ q.name }}</strong><br>
+            <small>{{ q.date_of_quiz.strftime('%Y-%m-%d') if q.date_of_quiz else 'No date' }} | Duration: {{ q.duration }} min</small>
+          </div>
+          <a href="{{ url_for('take_quiz', quiz_id=q.id) }}" class="btn btn-sm btn-outline-primary">Take Quiz</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted">No quizzes available yet.</p>
+  {% endif %}
+</div>
 {% endblock %}

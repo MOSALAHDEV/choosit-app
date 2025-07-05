@@ -1,60 +1,49 @@
 {% extends "base.html" %}
 {% block title %}Register{% endblock %}
 
-{% block content %}
-<h1>User Registration</h1>
+{% block ops %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <h2 class="mb-4 text-center">Create an Account</h2>
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
 
-<form method="POST">
-    {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.fullname.label(class="form-label") }}
+            {{ form.fullname(class="form-control", placeholder="Full Name") }}
+            {% for error in form.fullname.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
 
-    <div>
-        {{ form.fullname.label }}<br>
-        {{ form.fullname(size=32) }}
-        {% if form.fullname.errors %}
-            <ul class="error">
-                {% for error in form.fullname.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
+        <div class="mb-3">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control", placeholder="Email") }}
+            {% for error in form.email.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
 
-    <div>
-        {{ form.email.label }}<br>
-        {{ form.email(size=32) }}
-        {% if form.email.errors %}
-            <ul class="error">
-                {% for error in form.email.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
+        <div class="mb-3">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control", placeholder="Password") }}
+            {% for error in form.password.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
 
-    <div>
-        {{ form.password.label }}<br>
-        {{ form.password(size=32) }}
-        {% if form.password.errors %}
-            <ul class="error">
-                {% for error in form.password.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
+        <div class="mb-3">
+            {{ form.confirm_pass.label(class="form-label") }}
+            {{ form.confirm_pass(class="form-control", placeholder="Confirm Password") }}
+            {% for error in form.confirm_pass.errors %}
+              <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
 
-    <div>
-        {{ form.confirm_pass.label }}<br>
-        {{ form.confirm_pass(size=32) }}
-        {% if form.confirm_pass.errors %}
-            <ul class="error">
-                {% for error in form.confirm_pass.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
-
-    <div>{{ form.submit() }}</div>
-</form>
+        <div class="d-grid">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+  </div>
+</div>
 {% endblock %}
