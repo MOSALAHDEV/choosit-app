@@ -20,6 +20,7 @@ def index():
     return render_template('home.html')
 
 
+# User Routes
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """Register route"""
@@ -58,7 +59,8 @@ def login():
 def dashboard():
     """Dashboard route"""
     quizzes = Quiz.query.all()
-    return render_template('dashboard.html', quizzes=quizzes)
+    scores = Score.query.filter_by(user_id=current_user.id).order_by(Score.timestamp.desc()).limit(5)
+    return render_template('dashboard.html', quizzes=quizzes, scores=scores)
 
 
 @app.route('/logout')
@@ -68,6 +70,41 @@ def logout():
     logout_user()
     flash('User logged out successfully!', category="success")
     return redirect(url_for('login'))
+
+
+# User>>>Take Quiz Get Result Route
+@app.route('/quiz/<int:quiz_id>', methods=['GET', 'POST'])
+@login_required
+def take_quiz(quiz_id):
+    """take quiz route"""
+    quiz = Quiz.query.get_or_404(quiz_id)
+    questions = Question.query.filter_by(quiz_id=quiz_id).all()
+    questions_count = len(questions)
+    if request.method == 'POST':
+        score = 0
+        for question in questions:
+            user_answer = request.form.get(f'question_{question.id}')
+            if user_answer == question.correct_option:
+                score += 1
+        user_result = Score(user_id=current_user.id, quiz_id=quiz_id, score=score)
+        db.session.add(user_result)
+        db.session.commit()
+        flash(f'Quiz completed successfully! Your score is {score} out of {questions_count}', 'success')
+        return redirect(url_for('result', quiz_id=quiz_id))
+    return render_template('take_quiz.html', quiz=quiz, questions=questions, questions_count=questions_count)
+
+
+# User>>>Result Route
+@app.route('/result/<int:quiz_id>', methods=['GET'])
+@login_required
+def result(quiz_id):
+    """result route"""
+    quiz = Quiz.query.get_or_404(quiz_id)
+    score = Score.query.filter_by(quiz_id=quiz_id).order_by(Score.timestamp.desc()).first()
+    if not score:
+        flash('No score found for this quiz.', 'danger')
+        return redirect(url_for('dashboard'))
+    return render_template('result.html', quiz=quiz, score=score)
 
 
 @login_manager.user_loader
@@ -127,7 +164,7 @@ def admin_manage_score():
     return render_template('/admin/manage_score.html', score=score)
 
 
-# Subject Management Routes
+# Admin>>>Subject Management Routes
 @app.route('/admin/manage_subject', methods=['GET', 'POST'])
 @login_required
 def admin_manage_subject():
@@ -139,6 +176,7 @@ def admin_manage_subject():
     return render_template('/admin/manage_subject.html', subject=subject)
 
 
+# Admin>>>Subject Management Routes>>>Add Subject Route
 @app.route('/admin/add_subject', methods=['GET', 'POST'])
 @login_required
 def admin_add_subject():
@@ -191,7 +229,7 @@ def admin_delete_subject(id):
     return redirect(url_for('admin_manage_subject'))
 
 
-# Quiz Management Routes
+# Admin>>>Quiz Management Routes>>>Manage Quiz Route
 @app.route('/admin/manage_quiz', methods=['GET', 'POST'])
 @login_required
 def admin_manage_quiz():
@@ -203,6 +241,7 @@ def admin_manage_quiz():
     return render_template('/admin/manage_quiz.html', quiz=quiz)
 
 
+# Admin>>>Quiz Management Routes>>>Add Quiz Route
 @app.route('/admin/add_quiz', methods=['GET', 'POST'])
 @login_required
 def admin_add_quiz():
@@ -259,7 +298,7 @@ def admin_delete_quiz(id):
     return redirect(url_for('admin_manage_quiz'))
 
 
-# Question Management Routes
+# Admin>>>Question Management Routes>>>Manage Question Route
 @app.route('/admin/manage_question/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
 def admin_manage_question(quiz_id):
@@ -296,6 +335,7 @@ def admin_add_question(quiz_id):
     return render_template('/admin/add_question.html', form=form, quiz=quiz)
 
 
+# Admin>>>Question Management Routes>>>Edit Question Route
 @app.route('/admin/edit_question/<int:id>', methods=['GET', 'POST'])
 @login_required
 def admin_edit_question(id):
@@ -329,32 +369,3 @@ def admin_delete_question(id):
     db.session.commit()
     flash('Question deleted successfully!', 'success')
     return redirect(url_for('admin_manage_question', quiz_id=quiz_id))
-
-# Take Quiz Get Result Route
-@app.route('/quiz/<int:quiz_id>', methods=['GET', 'POST'])
-@login_required
-def take_quiz(quiz_id):
-    """take quiz route"""
-    quiz = Quiz.query.get_or_404(quiz_id)
-    questions = Question.query.filter_by(quiz_id=quiz_id).all()
-    if request.method == 'POST':
-        score = 0
-        for question in questions:
-            user_answer = request.form.get(f'question_{question.id}')
-            if user_answer == question.correct_option:
-                score += 1
-        user_result = Score(user_id=current_user.id, quiz_id=quiz_id, score=score)
-        db.session.add(user_result)
-        db.session.commit()
-        flash(f'Quiz completed successfully! Your score is {score} out of {len(questions)}', 'success')
-        return redirect(url_for('result', quiz_id=quiz_id))
-    return render_template('take_quiz.html', quiz=quiz, questions=questions)
-
-
-@app.route('/result/<int:quiz_id>', methods=['GET'])
-@login_required
-def result(quiz_id):
-    """result route"""
-    quiz = Quiz.query.get_or_404(quiz_id)
-    score = Score.query.filter_by(quiz_id=quiz_id).all()
-    return render_template('result.html', quiz=quiz, score=score)
