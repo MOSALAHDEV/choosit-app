@@ -343,6 +343,10 @@ def take_quiz(quiz_id):
     """take quiz route"""
     quiz = Quiz.query.get_or_404(quiz_id)
     questions = Question.query.filter_by(quiz_id=quiz_id).all()
+    previous_score = Score.query.filter_by(user_id=current_user.id, quiz_id=quiz_id).first()
+    if previous_score:
+        flash('You have already taken this quiz.', 'warning')
+        return redirect(url_for('result', quiz_id=quiz_id))
     questions_count = len(questions)
     if request.method == 'POST':
         score = 0
