@@ -23,10 +23,12 @@ class LoginForm(FlaskForm):
     ])
     submit = SubmitField('Login')
 
+
 class subjectForm(FlaskForm):
     name = StringField('Subject Name', validators=[DataRequired(), Length(min=2, max=80)])
     description = StringField('Description', validators=[Length(max=200)])
     submit = SubmitField('Add Subject')
+
 
 class quizForm(FlaskForm):
     name = StringField('Quiz Name', validators=[DataRequired(), Length(min=2, max=80)])
@@ -35,16 +37,17 @@ class quizForm(FlaskForm):
     duration = IntegerField('Duration', validators=[DataRequired()])
     submit = SubmitField('Add Quiz')
 
+
 class questionForm(FlaskForm):
     statement = StringField('Statement', validators=[DataRequired()])
     answer_1 = StringField('First Choice', validators=[DataRequired()])
     answer_2 = StringField('Second Choice', validators=[DataRequired()])
     answer_3 = StringField('Third Choice', validators=[DataRequired()])
     answer_4 = StringField('Fourth Choice', validators=[DataRequired()])
-    
+
     correct_option = SelectField(
         'Correct Choice',
         choices=[('A', 'First Choice'), ('B', 'Second Choice'), ('C', 'Third Choice'), ('D', 'Fourth Choice')],
         validators=[DataRequired()])
-    
+
     submit = SubmitField('Add Question')

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 from app import db
 from datetime import datetime
-""" Score model """
+
 
 class Score(db.Model):
     """ Score model """

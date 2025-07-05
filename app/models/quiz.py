@@ -2,6 +2,7 @@
 from app import db
 """ Quiz model """
 
+
 class Quiz(db.Model):
     """ Quiz model """
     id = db.Column(db.Integer, primary_key=True)
