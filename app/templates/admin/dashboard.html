@@ -1,19 +1,62 @@
 {% extends "base.html" %}
-
 {% block title %}Admin Dashboard{% endblock %}
 
-{% block content %}
-<h1>Admin Dashboard</h1>
-<div>
-    <ul>
-        <li><a href="{{ url_for('admin_manage_subject') }}">Manage subject</a></li>
-        <li><a href="{{ url_for('admin_manage_quiz') }}">Manage quiz</a></li>
-        <li><a href="{{ url_for('admin_manage_user') }}">Manage user</a></li>
-        <li><a href="{{ url_for('admin_manage_score') }}">Manage score</a></li>
-    </ul>
-    <div>
-        {% block ops %}
-        {% endblock %}
+{% block ops %}
+<div class="container">
+  <h2 class="mb-4">Admin Dashboard</h2>
+
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+
+    <div class="col">
+      <div class="card border-primary h-100">
+        <div class="card-body">
+          <h5 class="card-title">📚 Subjects</h5>
+          <p class="card-text">Add, edit, or delete quiz subjects.</p>
+          <a href="{{ url_for('admin_manage_subject') }}" class="btn btn-outline-primary">Manage Subjects</a>
+        </div>
+      </div>
     </div>
+
+    <div class="col">
+      <div class="card border-success h-100">
+        <div class="card-body">
+          <h5 class="card-title">📝 Quizzes</h5>
+          <p class="card-text">Manage all quizzes and scheduling.</p>
+          <a href="{{ url_for('admin_manage_quiz') }}" class="btn btn-outline-success">Manage Quizzes</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card border-warning h-100">
+        <div class="card-body">
+          <h5 class="card-title">❓ Questions</h5>
+          <p class="card-text">Edit and add questions for quizzes.</p>
+          <a href="{{ url_for('admin_manage_question', quiz_id=1) }}" class="btn btn-outline-warning">Manage Questions</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card border-info h-100">
+        <div class="card-body">
+          <h5 class="card-title">👥 Users</h5>
+          <p class="card-text">View and manage user accounts.</p>
+          <a href="{{ url_for('admin_manage_user') }}" class="btn btn-outline-info">Manage Users</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card border-dark h-100">
+        <div class="card-body">
+          <h5 class="card-title">📊 Scores</h5>
+          <p class="card-text">Review quiz scores and performance.</p>
+          <a href="{{ url_for('admin_manage_score') }}" class="btn btn-outline-dark">Manage Scores</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 {% endblock %}
