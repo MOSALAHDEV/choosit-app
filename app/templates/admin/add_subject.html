@@ -1,11 +1,32 @@
-{% extends "admin/dashboard.html" %}
+{% extends "base.html" %}
 {% block title %}Add Subject{% endblock %}
+
 {% block ops %}
-<h2>Add Subject</h2>
-<form method="POST">
+<div class="container">
+  <h3 class="mb-4">Add New Subject</h3>
+
+  <form method="POST">
     {{ form.hidden_tag() }}
-    {{ form.name.label }} {{ form.name() }}
-    {{ form.description.label }} {{ form.description() }}
-    {{ form.submit() }}
-</form>
+
+    <div class="mb-3">
+      {{ form.name.label(class="form-label") }}
+      {{ form.name(class="form-control", placeholder="Enter subject name") }}
+      {% for error in form.name.errors %}
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.description.label(class="form-label") }}
+      {{ form.description(class="form-control", placeholder="Subject description") }}
+      {% for error in form.description.errors %}
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="d-grid">
+      {{ form.submit(class="btn btn-primary") }}
+    </div>
+  </form>
+</div>
 {% endblock %}
