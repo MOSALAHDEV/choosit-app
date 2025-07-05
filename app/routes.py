@@ -72,41 +72,6 @@ def logout():
     return redirect(url_for('login'))
 
 
-# User>>>Take Quiz Get Result Route
-@app.route('/quiz/<int:quiz_id>', methods=['GET', 'POST'])
-@login_required
-def take_quiz(quiz_id):
-    """take quiz route"""
-    quiz = Quiz.query.get_or_404(quiz_id)
-    questions = Question.query.filter_by(quiz_id=quiz_id).all()
-    questions_count = len(questions)
-    if request.method == 'POST':
-        score = 0
-        for question in questions:
-            user_answer = request.form.get(f'question_{question.id}')
-            if user_answer == question.correct_option:
-                score += 1
-        user_result = Score(user_id=current_user.id, quiz_id=quiz_id, score=score)
-        db.session.add(user_result)
-        db.session.commit()
-        flash(f'Quiz completed successfully! Your score is {score} out of {questions_count}', 'success')
-        return redirect(url_for('result', quiz_id=quiz_id))
-    return render_template('take_quiz.html', quiz=quiz, questions=questions, questions_count=questions_count)
-
-
-# User>>>Result Route
-@app.route('/result/<int:quiz_id>', methods=['GET'])
-@login_required
-def result(quiz_id):
-    """result route"""
-    quiz = Quiz.query.get_or_404(quiz_id)
-    score = Score.query.filter_by(quiz_id=quiz_id).order_by(Score.timestamp.desc()).first()
-    if not score:
-        flash('No score found for this quiz.', 'danger')
-        return redirect(url_for('dashboard'))
-    return render_template('result.html', quiz=quiz, score=score)
-
-
 @login_manager.user_loader
 def loading_user(user_id):
     return User.query.get(user_id)
@@ -369,3 +334,38 @@ def admin_delete_question(id):
     db.session.commit()
     flash('Question deleted successfully!', 'success')
     return redirect(url_for('admin_manage_question', quiz_id=quiz_id))
+
+
+# User>>>Take Quiz Get Result Route
+@app.route('/quiz/<int:quiz_id>', methods=['GET', 'POST'])
+@login_required
+def take_quiz(quiz_id):
+    """take quiz route"""
+    quiz = Quiz.query.get_or_404(quiz_id)
+    questions = Question.query.filter_by(quiz_id=quiz_id).all()
+    questions_count = len(questions)
+    if request.method == 'POST':
+        score = 0
+        for question in questions:
+            user_answer = request.form.get(f'question_{question.id}')
+            if user_answer == question.correct_option:
+                score += 1
+        user_result = Score(user_id=current_user.id, quiz_id=quiz_id, score=score)
+        db.session.add(user_result)
+        db.session.commit()
+        flash(f'Quiz completed successfully! Your score is {score} out of {questions_count}', 'success')
+        return redirect(url_for('result', quiz_id=quiz_id))
+    return render_template('take_quiz.html', quiz=quiz, questions=questions, questions_count=questions_count)
+
+
+# User>>>Result Route
+@app.route('/result/<int:quiz_id>', methods=['GET'])
+@login_required
+def result(quiz_id):
+    """result route"""
+    quiz = Quiz.query.get_or_404(quiz_id)
+    score = Score.query.filter_by(quiz_id=quiz_id).order_by(Score.timestamp.desc()).first()
+    if not score:
+        flash('No score found for this quiz.', 'danger')
+        return redirect(url_for('dashboard'))
+    return render_template('result.html', quiz=quiz, score=score)
