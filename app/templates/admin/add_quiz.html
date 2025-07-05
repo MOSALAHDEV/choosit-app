@@ -1,13 +1,48 @@
-{% extends "admin/dashboard.html" %}
+{% extends "base.html" %}
 {% block title %}Add Quiz{% endblock %}
+
 {% block ops %}
-<h2>Add Quiz</h2>
-<form method="POST">
+<div class="container">
+  <h3 class="mb-4">Add New Quiz</h3>
+
+  <form method="POST">
     {{ form.hidden_tag() }}
-    {{ form.name.label }} {{ form.name() }}
-    {{ form.subject_id.label }} {{ form.subject_id() }}
-    {{ form.date_of_quiz.label }} {{ form.date_of_quiz() }}
-    {{ form.duration.label }} {{ form.duration() }}
-    {{ form.submit() }}
-</form>
+
+    <div class="mb-3">
+      {{ form.name.label(class="form-label") }}
+      {{ form.name(class="form-control", placeholder="Enter quiz title") }}
+      {% for error in form.name.errors %}
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.subject_id.label(class="form-label") }}
+      {{ form.subject_id(class="form-select") }}
+      {% for error in form.subject_id.errors %}
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.date_of_quiz.label(class="form-label") }}
+      {{ form.date_of_quiz(class="form-control") }}
+      {% for error in form.date_of_quiz.errors %}
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.duration.label(class="form-label") }}
+      {{ form.duration(class="form-control", placeholder="Duration in minutes") }}
+      {% for error in form.duration.errors %}
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="d-grid">
+      {{ form.submit(class="btn btn-primary") }}
+    </div>
+  </form>
+</div>
 {% endblock %}
