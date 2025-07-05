@@ -16,7 +16,5 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
     login_manager.init_app(app)
-    from commands.seed_db import seed_db
-    app.cli.add_command(seed_db)
 
     return app
